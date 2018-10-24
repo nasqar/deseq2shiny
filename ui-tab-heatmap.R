@@ -1,0 +1,44 @@
+tabItem(tabName = "heatmapTab", 
+        fluidRow(
+          column(11,
+                 h3(strong("Heatmap")),
+                 wellPanel(
+                   fluidRow(
+                     column(3,
+                            numericInput("numGenes",label="Number of genes to include (ordered by SD max 1000)",
+                                         min=10,max= 1000,value=100,step=10)
+                     ),
+                     column(3,
+                            checkboxGroupInput("heat_group",
+                                               label="Select Group",
+                                               choices="", selected=""
+                            )
+                     ),
+                     column(4,
+                            checkboxInput("subsetGenes","Select a subset of genes"),
+                            conditionalPanel("input.subsetGenes",
+                                             textAreaInput("listPasteGenes", "List Of Genes (comma seperated)", width = "100%", rows = 5)
+                            )
+                     ),
+                     column(2,
+                            actionButton("genHeatmap","Generate Plot", class = "btn btn-primary", style = "width:100%;")
+                     )
+                   ),
+                   div(style = "clear:both;")
+                 ),
+                 hr(),
+                 conditionalPanel("output.heatmapComputed",
+                                  tags$div(class = "BoxArea2",
+                                           column(12,
+                                                  box(title = "Heatmap", solidHeader = T, status = "primary", width = 12,
+                                                      withSpinner(plotOutput(outputId = "heatmapPlot",height="1200px")))
+                                           ),
+                                           # h4(p(class = "text-right",downloadButton('downloadBoxCsv','Download .csv', class = "btn btn-primary btn-sm"))),
+                                           # withSpinner(dataTableOutput("boxplotData")),
+                                           div(style = "clear:both;")
+                                           
+                                  )
+                 )
+          )
+        )
+)

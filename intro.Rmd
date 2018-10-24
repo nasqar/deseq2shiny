@@ -1,0 +1,200 @@
+---
+title: "Intro"
+author: "Ayman Y"
+date: "July 15, 2018"
+output: html_document
+runtime: shiny
+---
+
+## Introduction
+
+---
+
+This Shiny app is a wrapper around **DESeq2**, an R package for **"Differential gene expression analysis based on the negative binomial distribution".**
+
+It is meant to provide an intuitive interface for researchers to easily **upload, analyze, visualize, and explore RNAseq count data** interactively with no prior programming knowledge in R.
+
+For details on this package, see <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">documentation</a>
+<div class="row"><hr style="border-style:none;"/></div>
+## Features
+---
+
+Various **visualizations** and **output data** are included:
+
+<p><small><strong><em style="color:#f38686;">* Click image to enlarge</em></strong></small></p>
+<div class="row">
+  
+   <div class="col-md-6">
+    <div class="row BoxArea5">
+      <ul>
+         <li>
+            <p><strong>Clustering</strong></p>
+            <ul>
+               <li><strong>R-Log</strong>, <strong>Variance Stabilizing Transformation</strong> (VST) output matrices</li>
+               <li><strong>PCA plots</strong>, <strong>Heatmaps</strong></li>
+            </ul>
+         </li>
+      </ul>
+
+      <hr/>
+      
+      <div class="col-md-2" style="width: 33%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/pcaplot.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+      <div class="col-md-2" style="width: 33%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/heatmap.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+      <div class="col-md-2" style="width: 33%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/distheatmap.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+   </div>
+  </div>
+  
+  
+   <div class="col-md-6">
+    <div class="row BoxArea5">
+      <ul>
+         <li>
+            <p><strong>Differential Expression</strong></p>
+            <ul>
+               <li>Comparison Data (<strong>logFC, p-value, etc, sample vs sample</strong>, etc …)</li>
+               <li>MA plots</li>
+            </ul>
+         </li>
+      </ul>
+      <hr/>
+      <div class="col-md-2" style="width: 50%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/maplot.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+
+   </div>
+  </div>
+  
+  
+   <div class="col-md-6">
+    <div class="row BoxArea5">
+      <ul>
+         
+         <li>
+            <p><strong>Gene Expression</strong> </p>
+            <ul>
+               <li>Gene <strong>Boxplots</strong></li>
+            </ul>
+         </li>
+      </ul>
+      <hr/>
+      <div class="col-md-2" style="width: 50%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/boxplot.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+
+   </div>
+  </div>
+</div>
+
+
+<div class="row"><hr style="border-style:none;"/></div>
+
+<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">              
+      <div class="modal-body">
+      	<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <img src="" class="imagepreview" style="width: 100%;" >
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row"><hr style="border-style:none;"/></div>
+## Input File & Conditions
+
+---
+
+### 1. Example data (Demo)
+
+- For demo purposes, you can select "Example data" and carry out the analysis to get familiar with the app
+
+- That will automatically load the **Tissue Comparison Data (Human)** that belongs to <a href="https://www.ncbi.nlm.nih.gov/pubmed?term=18978772" target="_blank">this published work</a>
+
+- The data can be found <a href="http://bowtie-bio.sourceforge.net/recount/" target="_blank">here</a>
+<div class="row"><hr style="border-style:none;"/></div>
+
+### 2. Upload your own data (gene counts)
+
+- A .csv/.txt file that contains a **table of the gene counts**
+
+- The first column should have gene names/ids followed by columns for sample counts. The file can be either **comma or tab delimited**
+
+- If your counts are not merged, you can use this <a href="http://nasqar.abudhabi.nyu.edu/countMerger">Count Merger</a> to consolidate all your sample count files
+
+- If samples contain **replicates**, they should be denoted by **underscore** and the replicate number (see **figure 2**)
+
+- If no replicates, then select **No replicates** option to help set the default experiment conditions for the next step
+
+- Avoid using special characters or spaces in sample names (**figure 1**), other than underscores to denote replicates (**figure 2**)
+
+- First column can either contain gene.ids or gene.names
+
+- Prefilter: You can also set a minimum number of counts per gene to include
+
+- For a sample file, download and view <a href="www/sampleCounts.csv" target="_blank">this</a> file
+
+
+<div class="col-md-6">
+<p><strong>figure 1 (No Replicates)</strong></p>
+<div class="BoxArea4" style="width: 100%;margin: 0 auto;display: block;">
+    <img src="www/sampleTable_norep.png" alt="Sample file" style="width: 100%;"/>
+</div>
+    
+</div>
+<div class="col-md-6">
+<p><strong>figure 2 (Replicates)</strong></p>
+<div class="BoxArea4" style="width: 100%;margin: 0 auto;display: block;">
+    <img src="www/sampleTable_reps.png" alt="Sample file" style="width: 100%;"/>
+</div>
+
+</div>
+
+<div class="col-md-12"><hr style="border-top: none;"></div>
+### 3. Experiment Conditions
+
+Setup experiment condition table
+
+- By default, if there are replicates, the sample name will be set as the condition for those samples
+
+- For example, if we take samples with replicates **(figure 2)**, the default condition table will be:
+
+<div class="row">
+<div class="col-md-5 col-md-offset-4">
+<p><strong>figure 3 (Condition Table)</strong></p>
+<div class="BoxArea4" style="width: 100%;margin: 0 auto;display: block;">
+    <img src="www/conditionTable.png" alt="Sample file" style="width: 100%; display: block;"/>
+    </div>
+
+</div>
+</div>
+
+<div class="col-md-12"><hr style="border-top: none;"></div>
+
+---
+
