@@ -21,6 +21,10 @@ heatmapReactive <- reactive({
   {
     isolate({
       vst = myValues$vstMat
+      selGroupSamples = as.character(myValues$DF[myValues$DF$Conditions %in% input$heat_group,]$Samples)
+      vst = vst[,selGroupSamples]
+      browser()
+      #vst = vst[,input$heat_group]
       
       if(!input$subsetGenes)
       {
@@ -71,8 +75,10 @@ output$heatmapPlot <- renderPlot({
     
     annCol = myValues$DF
     annCol[,1] = NULL
+    isolate({
+      annCol = annCol[which(annCol$Conditions %in% input$heat_group),]
+    })
     
-    #annCol = data.frame(group = c("CT6","CT6","CT18","CT18","CT24","CT24","CT12","CT12"))
     
     NMF::aheatmap(vst,scale = "none",
                   revC=TRUE,
