@@ -66,6 +66,8 @@ output$boxPlot <- renderPlotly({
     if(input$counttype == "vst")
       filtered$y = filtered$vst
     
+    ## Adapted from STARTapp dotplot
+    
     p <- ggplot(filtered,aes(x=group,y=y,fill=group)) + geom_boxplot()
     
     p <- p + facet_grid(.~ genes,scales = "free_y")+
@@ -78,6 +80,11 @@ output$boxPlot <- renderPlotly({
     p <- p + scale_fill_discrete(name="group",breaks=sel_group,
                                  labels=sel_group,
                                  guide=guide_legend(keyheight=4,keywidth=2))
+    
+    p <- p + theme_base() + ylab(" ") + xlab(" ")+theme(
+      plot.margin = unit(c(1,1,1,1), "cm"),
+      axis.text.x = element_text(angle = 45),
+      legend.position="bottom")+theme(legend.position="none")
     
     p
     
