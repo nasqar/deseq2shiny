@@ -14,6 +14,7 @@ library(ggthemes)
 library(plotly)
 library(BiocParallel)
 library(sodium)
+library(NMF)
 
 
 ui <- tagList(

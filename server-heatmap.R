@@ -79,9 +79,7 @@ output$heatmapPlot <- renderPlot({
     })
     
     
-    
-    browser()
-    NMF::aheatmap(vst,scale = "none",
+    aheatmap(vst,scale = "none",
                   revC=TRUE,
                   fontsize = 10,
                   cexRow = 1.2,
