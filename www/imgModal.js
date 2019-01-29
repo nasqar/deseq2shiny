@@ -8,3 +8,9 @@ $(function() {
 			$('#imagemodal').modal('show');
 		});
 });
+
+
+window.addEventListener("beforeunload", function (e) {
+  if(Cookies.get('_TRAEFIK_BACKEND') !== undefined)
+    Cookies.remove("_TRAEFIK_BACKEND");
+});
