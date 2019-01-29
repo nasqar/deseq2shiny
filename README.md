@@ -9,6 +9,9 @@ This Shiny app is a wrapper around **DESeq2**, an R package for **"Differential 
 It is meant to provide an intuitive interface for researchers to easily **upload, analyze, visualize, and explore RNAseq count data** interactively with no prior programming knowledge in R.
 
 
+### Online/Demo:
+You can try it online at http://nasqar.abudhabi.nyu.edu/deseq2shiny
+
 ### Features
 ---
 Various **visualizations** and **output data** are included:
@@ -26,6 +29,7 @@ Various **visualizations** and **output data** are included:
 *   **Gene Expression**
 
     *   Gene **Boxplots**
+      
       
 ---
 ![alt text](screenshotdeseq2.png "Input Data")
