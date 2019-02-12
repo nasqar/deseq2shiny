@@ -24,6 +24,8 @@ observe({
         BiocParallel::register(MulticoreParam(detectCores() / 2))
         dds <- DESeq(dds, parallel = T)
         
+        BiocParallel::register(SerialParam())
+        
         shiny::setProgress(value = 0.4, detail = "Calculating rlog matrix ...")
         
         rld <- rlog(dds)
@@ -60,10 +62,15 @@ observe({
         boxplotData$vst = flatVst$vst
         
         samples <- myValues$DF
-        boxplotData$group = unlist(lapply(boxplotData$sampleid, function(x){
-          samples[samples$Samples == x,]$Conditions
-        }))
         
+        # faster code
+        new = boxplotData
+        new[] <- lapply(boxplotData, function(x) samples$Conditions[match(x, samples$Samples)])
+        boxplotData$group = as.character(new$sampleid)
+        
+        # boxplotData$group = unlist(lapply(boxplotData$sampleid, function(x){
+        #   samples[samples$Samples == x,]$Conditions
+        # }))
         
         myValues$boxplotData = boxplotData
         
