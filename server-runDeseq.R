@@ -170,7 +170,7 @@ observe({
     content = function(file) {
       csv = myValues$rlogMat
       
-      write.csv(csv, file, row.names=F)
+      write.csv(csv, file, row.names=T)
     }
     
   )
@@ -181,7 +181,7 @@ observe({
     content = function(file) {
       csv = myValues$vstMat
       
-      write.csv(csv, file, row.names=F)
+      write.csv(csv, file, row.names=T)
     }
     
   )

@@ -47,7 +47,7 @@ output$downloadVsCsv <- downloadHandler(
   content = function(file) {
     csv = myValues$vsResults
     
-    write.csv(csv, file, row.names=F)
+    write.csv(csv, file, row.names=T)
   }
   
 )
