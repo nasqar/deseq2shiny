@@ -4,7 +4,7 @@ observe({
   #                      server=TRUE)
 
   tmpgroups = unique(myValues$DF$Conditions)
-  updateCheckboxGroupInput(session,'heat_group',
+  updateSelectizeInput(session,'heat_group',
                            choices=tmpgroups, selected=tmpgroups)
 
 

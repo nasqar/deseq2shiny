@@ -14,13 +14,14 @@ tabItem(tabName = "boxplotTab",
                                          ) #,
                           )
                           ),
-                   column(4, 
-                          checkboxGroupInput("sel_group",
+                   column(5, 
+                          selectizeInput("sel_group",
                                              label="Select Group",
+                                             multiple = T,
                                              choices="", selected=""
                           )
                           ),
-                   column(3,
+                   column(2,
                           radioButtons("counttype","Y axis:",choices=c("counts","rlog","vst"))
                           ),
                    # column(2,

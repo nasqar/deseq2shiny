@@ -39,6 +39,20 @@ tabItem(tabName = "inputdata",
                                     conditionalPanel("!output.noreplicates",
                                                      p("* Column names must indicate replicates by underscores (eg. sampleX_1,sampleX_2, etc ...)")
                                     ),
+                                    conditionalPanel("output.noreplicates",
+                                                     # tags$a(href = "#", bubbletooltip = 'If an experimental design is supplied which does not contain the necessary degrees of freedom for 
+                                                     #                          differential analysis, DESeq will provide a message to the user and follow the strategy outlined 
+                                                     #        <br> in Anders and Huber (2010) under the section "Working without replicates", wherein all the samples 
+                                                     #        are considered as replicates of a single group for the estimation of dispersion. As noted in the
+                                                     #        reference above: "Some overestimation of the variance may be expected, which will make that 
+                                                     #        approach conservative." Furthermore, "while one may not want to draw strong conclusions 
+                                                     #        from such an analysis, it may still be useful for exploration and hypothesis generation."',
+                                                     #        icon("info-circle")),
+                                                     p('Experiments without replicates do not allow for estimation of the dispersion of counts 
+                                                        around the expected value for each group, which is critical for differential expression analysis.'),
+                                                     span("For more details, click ",a("here",href="https://www.rdocumentation.org/packages/DESeq2/versions/1.12.3/topics/DESeq", target="_blank"))
+                                                     
+                                    , style = "color:#f56a6a;"),
                                     tags$div(class = "BoxArea2",
                                     numericInput("minRowCount",label="(Optional) Minimum number of counts to include for each gene (Default 0, to include all)",
                                                  min=0,value=0),

@@ -1,12 +1,15 @@
 observe({
   
   # Hide the loading message when the rest of the server function has executed
-  hide(id = "loading-content", anim = TRUE, animType = "fade")
-  
-  removeClass("app-content", "hidden")
+  # hide(id = "loading-content", anim = TRUE, animType = "fade")
+  # 
+  # removeClass("app-content", "hidden")
   
   shinyjs::hide(selector = "a[data-value=\"conditionsTab\"]")
   shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+  shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
+  shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+  
   shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
   shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
   shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")

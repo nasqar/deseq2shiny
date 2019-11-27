@@ -7,9 +7,13 @@ compareReactive <- reactive({
   {
     isolate({
       validate(
-        need(input$condition1 != input$condition2, message = "condition 1 must be different from condition 2")
+        need((input$condition1 != input$condition2) | input$no_replicates, message = "condition 1 must be different from condition 2")
       )
-      myValues$vsResults <- results(myValues$dds,contrast=c("Conditions",input$condition1,input$condition2))
+      
+      if(input$no_replicates)
+        myValues$vsResults <- results(myValues$dds)
+      else
+        myValues$vsResults <- results(myValues$dds,contrast=c("Conditions",input$condition1,input$condition2))
       
       return(myValues$vsResults)
     })
@@ -21,7 +25,7 @@ output$maPlot <- renderPlot({
   if(!is.null(compareReactive()))
   {
     isolate({
-      plotMA(compareReactive(), main=paste0(input$condition1,"_vs_",input$condition2), ylim=c(-input$ylim,input$ylim), alpha=input$alpha)
+      plotMA(compareReactive(), main="MA Plot", ylim=c(-input$ylim,input$ylim), alpha=input$alpha)
     })
     
   }
@@ -56,3 +60,8 @@ output$comparisonComputed <- reactive({
   return(!is.null(myValues$vsResults))
 })
 outputOptions(output, 'comparisonComputed', suspendWhenHidden=FALSE)
+
+output$noReplicates <- reactive({
+  return(input$no_replicates)
+})
+outputOptions(output, 'noReplicates', suspendWhenHidden=FALSE)

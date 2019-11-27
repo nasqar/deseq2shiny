@@ -8,7 +8,7 @@ library(rhandsontable)
 library(readr)
 library(RColorBrewer)
 library(DESeq2)
-library(pheatmap)
+library(heatmaply)
 library(ggplot2)
 library(ggthemes)
 library(plotly)
@@ -39,7 +39,7 @@ ui <- tagList(
   #hidden(
     div(
       id = "app-content",
-      class = "hidden",
+      # class = "hidden",
       dashboardPage(
         # skin = "purple",
         dashboardHeader(title = "DESeq2 Shiny"),
@@ -47,8 +47,10 @@ ui <- tagList(
           sidebarMenu(id = "tabs",
                       menuItem("0. User Guide", tabName = "introTab", icon = icon("info-circle")),
                       menuItem("1. Input Data", tabName = "inputdata", icon = icon("upload")),
-                      menuItem("2. Edit Conditions & Run", tabName = "conditionsTab", icon = icon("th")),
-                      menuItem("3. Run DESeq2", tabName = "deseqTab", icon = icon("bar-chart")),
+                      menuItem("2. Run DESeq2", tabName = "conditionsTab", icon = icon("th")),
+                      menuItem("   Running DESeq2", tabName = "deseqTab", icon = icon("bar-chart")),
+                      menuItem("   Rlog", tabName = "rlogTab", icon = icon("bar-chart")),
+                      menuItem("   VST", tabName = "vstTab", icon = icon("bar-chart")),
                       menuItem("   DE Results", tabName = "resultsTab", icon = icon("bar-chart")),
                       menuItem("   Gene Boxplot", tabName = "boxplotTab", icon = icon("bar-chart")),
                       menuItem("   Heatmap", tabName = "heatmapTab", icon = icon("bar-chart"))
@@ -56,20 +58,23 @@ ui <- tagList(
         ),
         dashboardBody(
           shinyjs::useShinyjs(),
-          inlineCSS(appCSS),
+          # inlineCSS(appCSS),
           extendShinyjs(script = "www/custom.js"),
           
           tags$head(
             tags$style(HTML(" .shiny-output-error-validation {color: darkred; } ")),
             tags$style(".mybuttonclass{background-color:#CD0000;} .mybuttonclass{color: #fff;} .mybuttonclass{border-color: #9E0000;}"),
-            tags$link(rel = "stylesheet", type = "text/css", href = "custom.css"),
-            tags$link(rel = "stylesheet", type = "text/css", href = "loading.css")
+            tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+            # ,
+            # tags$link(rel = "stylesheet", type = "text/css", href = "loading.css")
           ),
           tabItems(
             source("ui-tab-intro.R",local=TRUE)$value,
             source("ui-tab-inputdata.R",local=TRUE)$value,
             source("ui-tab-conditions.R",local=TRUE)$value,
             source("ui-tab-deseq.R",local = TRUE)$value,
+            source("ui-tab-rlog.R",local = TRUE)$value,
+            source("ui-tab-vst.R",local = TRUE)$value,
             source("ui-tab-analysisres.R",local = TRUE)$value,
             source("ui-tab-boxplot.R",local = TRUE)$value,
             source("ui-tab-heatmap.R",local = TRUE)$value
@@ -85,20 +90,20 @@ ui <- tagList(
           ),
         tags$script(src = "imgModal.js"))
     )
-  ,
-  # Loading message
-  div(
-    id = "loading-content",
-    
-    HTML('<div class="row vertical-center">
-<h2>Loading application, please wait ...
-<div class="spinner">
-  <div class="double-bounce1"></div>
-         <div class="double-bounce2"></div>
-         </div>
-         </h2>
-         </div>')
-  )
+#   ,
+#   # Loading message
+#   div(
+#     id = "loading-content",
+#     
+#     HTML('<div class="row vertical-center">
+# <h2>Loading application, please wait ...
+# <div class="spinner">
+#   <div class="double-bounce1"></div>
+#          <div class="double-bounce2"></div>
+#          </div>
+#          </h2>
+#          </div>')
+#   )
   
 
 )

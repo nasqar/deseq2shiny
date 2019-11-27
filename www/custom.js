@@ -34,7 +34,11 @@ shinyjs.addStatusIcon = function(params)
         menuitem.append('<span class="badge" style="float: right;"><i class="fa fa-download"></i></span>');
         break;
         
-      
+/*      case '':
+        
+        $("button.btn").addClass("button-3d");
+        $("button.btn").not("#addConditions").not("#removeCol").removeAttr("disabled");
+        break;*/
 
     }
   

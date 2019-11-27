@@ -8,13 +8,14 @@ tabItem(tabName = "heatmapTab",
                             numericInput("numGenes",label="Number of genes to include (ordered by SD max 1000)",
                                          min=10,max= 1000,value=100,step=10)
                      ),
-                     column(3,
-                            checkboxGroupInput("heat_group",
+                     column(5,
+                            selectizeInput("heat_group",
                                                label="Select Group",
+                                               multiple = T,
                                                choices="", selected=""
                             )
                      ),
-                     column(4,
+                     column(2,
                             checkboxInput("subsetGenes","Select a subset of genes"),
                             conditionalPanel("input.subsetGenes",
                                              textAreaInput("listPasteGenes", "List Of Genes (comma seperated)", width = "100%", rows = 5)
