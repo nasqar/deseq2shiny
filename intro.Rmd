@@ -157,9 +157,9 @@ Various **visualizations** and **output data** are included:
 
 - Prefilter: You can also set a minimum number of counts per gene to include
 
-- For a simple-factor experiment sample counts file, download and view <a href="www/sampleCounts.csv" target="_blank">this</a> file
+- For a simple-factor experiment sample counts file, download and view <a href="sampleCounts.csv" target="_blank">this</a> file
 
-- For a multi-factor experiment example file, download and view <a href="www/chenCounts.csv" target="_blank">this</a>  counts file and the following <a href="www/chenMeta.csv" target="_blank">metadata file</a>.
+- For a multi-factor experiment example file, download and view <a href="chenCounts.csv" target="_blank">this</a>  counts file and the following <a href="chenMeta.csv" target="_blank">metadata file</a>.
 
 <div class="col-md-6">
 <p><strong>figure 1 (No Replicates)</strong></p>
