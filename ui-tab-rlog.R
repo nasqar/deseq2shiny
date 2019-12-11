@@ -12,6 +12,7 @@ tabItem(tabName = "rlogTab",
                                         withSpinner(plotlyOutput(outputId = "rlogPlot"))
                                     ),
                                     box(title = "PCA Plot", width = 6, solidHeader = T, status = "primary",
+                                        selectInput("rlogIntGroupsInput","Group of interest", choices=c()),
                                         withSpinner(plotlyOutput(outputId = "rlogPcaPlot"))
                                     ),
                                     h4(p(class = "text-right",downloadButton('downloadRlogCsv','Download rlog.csv', class = "btn btn-primary btn-sm"))),

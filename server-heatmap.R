@@ -2,10 +2,13 @@ observe({
   # updateSelectizeInput(session,'sel_gene',
   #                      choices= rownames(myValues$dataCounts),
   #                      server=TRUE)
+# browser()
+  tmpgroups = colnames(myValues$DF)
+  tmpgroups = unlist(lapply(tmpgroups, function(x) {levels(myValues$DF[,x])}))
 
-  tmpgroups = unique(myValues$DF$Conditions)
   updateSelectizeInput(session,'heat_group',
-                           choices=tmpgroups, selected=tmpgroups)
+                       choices=tmpgroups, selected=tmpgroups, server = T)
+  
 
 
 })
@@ -20,16 +23,25 @@ heatmapReactive <- reactive({
   if(input$genHeatmap > 0)
   {
     isolate({
-      vst = myValues$vstMat
-      selGroupSamples = as.character(myValues$DF[myValues$DF$Conditions %in% input$heat_group,]$Samples)
-      vst = vst[,selGroupSamples]
+      
+      logNormCounts <-log2((counts(myValues$dds, normalized=TRUE, replaced=FALSE)+.5))
+      # %>%
+      #   gather(gene, expression, (ncol(.)-length(input$sel_gene)+1):ncol(.))
+      
+      
+      
+      #vst = myValues$vstMat
+      
+      # selGroupSamples = row.names(myValues$DF[myValues$DF$Conditions %in% input$heat_group,])
+      # logNormCounts = logNormCounts[,selGroupSamples]
+      
       #vst = vst[,input$heat_group]
       
       if(!input$subsetGenes)
       {
-        tmpsd = apply(vst,1,sd)
+        tmpsd = apply(logNormCounts,1,sd)
         
-        selectGenes = rownames(vst)[order(tmpsd,decreasing=TRUE)]
+        selectGenes = rownames(logNormCounts)[order(tmpsd,decreasing=TRUE)]
         selectGenes = head(selectGenes,input$numGenes)
         
         genesNotFound = NULL
@@ -44,7 +56,7 @@ heatmapReactive <- reactive({
         
         genes = genes[genes != ""] 
         
-        genesNotFound = genes[!(genes %in% rownames(vst))]
+        genesNotFound = genes[!(genes %in% rownames(logNormCounts))]
         
         genes = genes[!(genes %in% genesNotFound)]
         
@@ -52,8 +64,8 @@ heatmapReactive <- reactive({
         
       }
       
-      vst = vst[selectGenes,]
-      return(list('vst'=vst,'genesNotFound'=genesNotFound))
+      logNormCounts = logNormCounts[selectGenes,]
+      return(list('logNormCounts'=logNormCounts,'genesNotFound'=genesNotFound))
     })
     
   }
@@ -64,41 +76,64 @@ heatmapReactive <- reactive({
 output$heatmapPlot <- renderPlot({
   if(!is.null(heatmapReactive()))
   {
-    vst= heatmapReactive()$vst
+    logNormCounts= heatmapReactive()$logNormCounts
     genesNotFound = heatmapReactive()$genesNotFound
     
     validate(
       need( is.null(genesNotFound) || length(genesNotFound) < 1, message = "Some genes were not found!"),
-      need(nrow(vst) > 1, message = "Need atleast 2 genes to plot!")
+      need(nrow(logNormCounts) > 1, message = "Need atleast 2 genes to plot!")
     )
+    # 
+    # conditions = myValues$DF
+    # 
+    # isolate({
+    #   annCol = data.frame(Conditions=as.character(conditions[which(conditions$Conditions %in% input$heat_group),]))
+    # })
+    # 
     
-    conditions = myValues$DF
-    conditions[,1] = NULL
-    isolate({
-      annCol = data.frame(Conditions=as.character(conditions[which(conditions$Conditions %in% input$heat_group),]))
-    })
+    coldata = colData(myValues$dds)
+    coldata$sizeFactor = NULL
+    coldata$replaceable = NULL
     
-    
-    aheatmap(vst,scale = "none",
+    if(input$no_replicates)
+    {
+      annLegend = F
+      Rowv = NA
+      annCol = NULL
+    }
+    else
+    {
+      annLegend = T
+      Rowv = NA
+      annCol <- as.data.frame(coldata[, colnames(coldata)[ !colnames( coldata) %in% c("sizeFactor","replaceable")]] )
+      
+    }
+     
+    aheatmap(logNormCounts,scale = "none",
                   revC=TRUE,
                   fontsize = 10,
                   cexRow = 1.2,
-                  color = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
-                  annCol = annCol)
+                  Rowv = Rowv,
+                  annLegend = annLegend,
+                  #color = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
+                  annCol = annCol
+             )
     
   }
   
   
 })
-# 
-# output$boxplotData <- renderDataTable({
-#   if(!is.null(heatmapReactive()))
-#   {
-#     heatmapReactive()
-#   }
-# }, 
-# options = list(scrollX = TRUE, pageLength = 5))
-# 
+
+
+
+output$heatmapData <- renderDataTable({
+  if(!is.null(heatmapReactive()))
+  {
+    heatmapReactive()$logNormCounts
+  }
+}, 
+options = list(scrollX = TRUE, pageLength = 5))
+
 # 
 output$heatmapComputed <- reactive({
   return(!is.null(heatmapReactive()))
@@ -106,13 +141,13 @@ output$heatmapComputed <- reactive({
 outputOptions(output, 'heatmapComputed', suspendWhenHidden=FALSE)
 
 
-# output$downloadBoxCsv <- downloadHandler(
-#   
-#   filename = function() {paste0(input$condition1,"_vs_",input$condition2,".csv")},
-#   content = function(file) {
-#     csv = heatmapReactive()
-#     
-#     write.csv(csv, file, row.names=F)
-#   }
-#   
-# )
+output$downloadHeatmapCsv <- downloadHandler(
+
+  filename = function() { "heatmap_data.csv"},
+  content = function(file) {
+    csv = heatmapReactive()$logNormCounts
+
+    write.csv(csv, file, row.names=F)
+  }
+
+)

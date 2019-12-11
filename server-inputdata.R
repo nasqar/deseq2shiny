@@ -46,7 +46,7 @@ inputFileReactive <- reactive({
   
   # Check if example selected, or if not then ask to upload a file.
   shiny:: validate(
-    need( identical(input$data_file_type,"examplecounts")|(!is.null(input$datafile))|(!is.null(query[['countsdata']])),
+    need( identical(input$data_file_type,"examplecounts")|identical(input$data_file_type,"examplecountsfactors")|(!is.null(input$datafile))|(!is.null(query[['countsdata']])),
           message = "Please select a file")
   )
   
@@ -70,6 +70,12 @@ inputFileReactive <- reactive({
   {
     inFile = "www/wang_count_table.csv"
     updateCheckboxInput(session, "no_replicates", value = "true")
+  }
+  else if(input$data_file_type=="examplecountsfactors")
+  {
+    inFile = "www/chenCounts.csv"
+    if(input$no_replicates )
+      updateCheckboxInput(session, "no_replicates", value = "false")
   }
   
   # select file separator, either tab or comma
@@ -125,21 +131,43 @@ csvDataReactive <- eventReactive(input$submit,{
   
   sampleN = colnames(fileContent)
   
+  #updateTextInput(session,"designFormula",value = "~ 1")
+  
+  
   if(input$no_replicates)
+  {
     sampleConditions = sampleN
+    #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
+    samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
+    
+  }
   else
   {
-    sampleConditions = strsplit(sampleN,"_")
-    sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
+    if(identical(input$data_file_type,"examplecountsfactors"))
+    {
+      samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
+      
+    }
+    else
+    {
+      sampleConditions = strsplit(sampleN,"_")
+      #sampleConditions = unlist(sampleConditions)
+      sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
+      
+      #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
+      samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
+      #updateTextInput(session,"designFormula",value = "~ Conditions")
+    }
+    
+    
+    
   }
   
-  #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
-  samples <- data.frame(Samples = sampleN, Conditions = sampleConditions)
-
   
   #myValues$countsData = fileContent
   
   myValues$DF = samples
+  updateDesignFormula()
   
   return(list('countsData' = fileContent))
   
@@ -154,3 +182,12 @@ output$noreplicates <- reactive({
   return(input$no_replicates)
 })
 outputOptions(output, 'noreplicates', suspendWhenHidden=FALSE)
+
+
+observe({
+  if(input$data_file_type %in% c("examplecountsfactors", "countsFile"))
+  {
+    updateCheckboxInput(session, "no_replicates", value = F)
+    test = inputFileReactive()
+  }
+})

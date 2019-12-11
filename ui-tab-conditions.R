@@ -28,16 +28,33 @@ tabItem(tabName = "conditionsTab",
           )
         ),
         conditionalPanel("(output.ddsComputed && input.run_deseq2 > 0) || (!output.ddsComputed && input.run_deseq2 < 1) || output.deseqError",
-                         column(
-                           10,
+                         box(title = "Design Formula", solidHeader = T, status = "primary",width = 10,
+                             wellPanel(
+                               textInput("designFormula","Design Formula:", placeholder = "~ Conditions")
+                             )
+                            )
+                         ,
+                         
+                         box(
+                           title = "Run",
+                           solidHeader = T,
+                           status = "success",
+                           width = 2,
+                           
+                           actionButton("run_deseq2", "Run DESeq2", class = "btn btn-success",
+                                        style = "width:100%;height:60px;")
+                         )
+                         ,
+                         
                            box(
-                             title = "Conditions/Factors (Optional)",
+                             title = "Conditions/Factors",
                              solidHeader = T,
                              status = "primary",
-                             width = 12,
+                             width = 10,
+                             h4(strong("Option 1) Edit Table: ")),
                              column(
                                8,
-                               h4("Edit Table"),
+                               
                                rHandsontableOutput("table"),
                                hr(),
                                tags$ul(
@@ -49,8 +66,10 @@ tabItem(tabName = "conditionsTab",
                              ),
                              column(
                                4,
-                               h4("Add Conditions/Factors"),
                                wellPanel(
+                               
+                               column(12,
+                                      #h4("Add Conditions/Factors"),
                                  textInput("conditionName", "Condition/Factor Name", placeholder = "Eg. Time"),
                                  textInput(
                                    "conditions",
@@ -60,36 +79,41 @@ tabItem(tabName = "conditionsTab",
                                  actionButton(
                                    "addConditions",
                                    "Add Condition/Factor",
-                                   class = "btn btn-primary",
-                                   disabled = "disabled"
+                                   class = "btn btn-primary"
                                  )
                                ),
-                               hr(),
-                               h4("Remove Columns"),
-                               wellPanel(
+                               
+                               
+                               column(12,
+                                      hr(),
+                                      #h4("Remove Columns"),
+                                      
                                  selectInput("colToRemove", "Remove Column", choices = NULL),
                                  actionButton(
                                    "removeCol",
                                    "Remove",
                                    class = "btn btn-danger",
-                                   disabled = "disabled",
                                    icon = icon("times")
                                  )
                                )
+                               ,
+                               tags$div(class = "clearBoth")
                              )
+                             ),
+                             column(12,
+                                    hr(),
+                                    h4(strong("Option 2) Upload Experiment design table (meta table)")),
+                                    p(".csv/.txt counts file (tab or comma delimited)")
+                                    ,
+                                    fileInput('metadatafile', '',
+                                              accept=c('text/csv', 
+                                                       'text/comma-separated-values,text/plain', 
+                                                       '.csv'),multiple = FALSE
+                                    )
+                                    )
                            )
-                         ),
-                         column(2,
-                                box(
-                                  title = "Run",
-                                  solidHeader = T,
-                                  status = "primary",
-                                  width = 12,
-                                  
-                                  actionButton("run_deseq2", "Run DESeq2", class = "btn btn-success",
-                                               style = "width:100%;height:60px;")
-                                )
-                         ),
+                         
+                         ,
                          tags$div(class = "clearBoth")
         )
         )#fluidrow

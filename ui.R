@@ -15,6 +15,8 @@ library(plotly)
 library(BiocParallel)
 library(sodium)
 library(NMF)
+library(tidyr)
+library(dplyr)
 
 
 appCSS <- "
@@ -86,7 +88,13 @@ ui <- tagList(
       tags$footer(
         wellPanel(
           HTML('
-               <p align="center" width="4">Developed and maintained by: Core Bioinformatics, Center for Genomics and Systems Biology, NYU Abu Dhabi</p>')
+               <p align="center" width="4">Core Bioinformatics, Center for Genomics and Systems Biology, NYU Abu Dhabi</p>
+      <p align="center" width="4">Github: <a href="https://github.com/nasqar/deseq2shiny/">https://github.com/nasqar/deseq2shiny/</a></p>
+               <p align="center" width="4">Maintained by: <a href="mailto:ay21@nyu.edu">Ayman Yousif</a> </p>
+                <p align="center" width="4">Issues / Features requests: <a href="https://github.com/nasqar/deseq2shiny/issues" target="_blank">https://github.com/nasqar/deseq2shiny/issues</a></p>
+               <p align="center" width="4">Using <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a> version 1.24.0</p>
+               <p align="center" width="4">Copyright (C) 2019, code licensed under GPLv3</p>'
+               )
           ),
         tags$script(src = "imgModal.js"))
     )

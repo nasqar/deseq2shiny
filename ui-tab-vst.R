@@ -10,6 +10,7 @@ tabItem(tabName = "vstTab",
                                                  withSpinner(plotlyOutput(outputId = "vsdPlot"))
                                              ),
                                              box(title = "PCA Plot", width = 6, solidHeader = T, status = "primary",
+                                                 selectInput("vsdIntGroupsInput","Group of interest", choices=c()),
                                                  withSpinner(plotlyOutput(outputId = "vsdPcaPlot"))
                                              ),
 

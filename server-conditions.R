@@ -1,38 +1,4 @@
 
-# observe({
-#   tableCreateReactive()
-# })
-# 
-# tableCreateReactive <- reactive({
-#   
-#   if(input$createTable > 0)
-#   {
-#     isolate({
-#       
-#       
-#       validate(
-#         
-#         need((input$samplesList!="")|(!is.null(input$datafile)),
-#              message = "Please select a file or type in list of sample names")
-#       )
-#       
-#       
-#       if(input$samplesList!="")
-#         inputSampleNames = input$samplesList
-#       else
-#         inputSampleNames <- read_file(input$datafile$datapath)
-#       
-#       samplenames = getSampleNamesFromStr(inputSampleNames)
-#       
-#       DF = data.frame(Samples=samplenames)
-#       
-#       
-#       myValues$DF = DF
-#       myValues$conditions = list()
-#     })
-#   }
-# })
-
 
 observe({
   
@@ -46,6 +12,7 @@ observeEvent(input$removeCol,{
     need(input$colToRemove != "", message = "need to select column to remove")
   )
   myValues$DF[,input$colToRemove] = NULL
+  updateDesignFormula()
 })
 
 observe({
@@ -79,7 +46,7 @@ tableEditReactive <- reactive({
       
       updateTextInput(session, "conditionName", value = "")
       updateTextInput(session, "conditions",value = "")
-      
+      updateDesignFormula()
     })
   }
 })
@@ -97,7 +64,7 @@ output$table = renderRHandsontable({
     return()
   
   
-  table = rhandsontable(DF1)  %>%
+  table = rhandsontable(DF1, rowHeaderWidth=100)  %>%
     hot_cols(colWidths = 150)
   
   table =  table %>% hot_table(highlightCol = TRUE, highlightRow = TRUE, colHeaders = NULL)
@@ -116,9 +83,81 @@ output$table = renderRHandsontable({
 })
 
 output$downloadCSV <- downloadHandler(
-  
   filename = paste0("metadatatable_",format(Sys.time(), "%y-%m-%d_%H-%M-%S"),".csv"),
   content = function(file) {
-    write.csv(hot_to_r(input$table), file, row.names=F)
+    write.csv(hot_to_r(input$table), file, row.names=T)
   }
 )
+
+observe({
+  metadataFileReactive()
+})
+metadataFileReactive <- reactive({
+  
+  # Check if example selected, or if not then ask to upload a file.
+  shiny:: validate(
+    need( (!is.null(input$metadatafile)),
+          message = "Please select a file")
+  )
+  
+  inFile <- input$metadatafile
+  if (is.null(inFile))
+    return(NULL)
+    
+  inFile = inFile$datapath  
+    
+  # select file separator, either tab or comma
+  sep = '\t'
+  if(length(inFile) > 0 ){
+    testSep = read.csv(inFile[1], header = TRUE, sep = '\t')
+    if(ncol(testSep) < 2)
+      sep = ','
+  }
+  else
+    return(NULL)
+  
+  fileContent = read.csv(inFile[1], header = TRUE, sep = sep)
+  
+  sampleN = colnames(fileContent)[-1]
+  metaData <- fileContent[,sampleN]
+  metaData <- data.frame(sapply( metaData, as.factor ))
+  row.names(metaData) <- fileContent[,1]
+  
+  myValues$DF = metaData
+  
+  updateDesignFormula()
+  
+  return(metaData)
+})
+
+
+updateDesignFormula = function()
+{
+  isolate({
+    groupvars = colnames(myValues$DF)
+    
+    if(length(groupvars) == 1)
+    {
+      if(length(levels(myValues$DF[,groupvars])) == nrow(myValues$DF)) 
+        designFormula = "~ 1"
+      else
+        designFormula = paste("~ ",groupvars)
+    }
+      
+    else
+      designFormula = paste(" ~ ",paste(groupvars, collapse=" + "))
+    
+    updateTextInput(session,"designFormula", value = designFormula)
+  })
+  
+}
+
+
+getConditionsListFromStr <- function(conditonsStr)
+{
+  conditions =isolate(  unlist(strsplit(conditonsStr,",")) )
+  conditions = trimws(conditions)
+  conditions = conditions[conditions != ""]
+  conditions = unique(conditions)
+  return(conditions)
+}

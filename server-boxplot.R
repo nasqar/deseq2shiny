@@ -2,10 +2,27 @@ observe({
   updateSelectizeInput(session,'sel_gene',
                        choices= rownames(myValues$dataCounts),
                        server=TRUE)
+  updateSelectizeInput(session,'sel_groups',
+                       choices= colnames(myValues$DF),
+                       server=TRUE)
+})
+observe({
+
   
-  tmpgroups = unique(myValues$DF$Conditions)
-  updateSelectizeInput(session,'sel_group',
-                           choices=tmpgroups, selected=tmpgroups)
+  updateSelectInput(session,'boxplotX',
+                       choices= colnames(myValues$DF),
+                    selected = colnames(myValues$DF)[1])
+  
+  updateSelectInput(session,'boxplotFill',
+                       choices= colnames(myValues$DF),
+                    selected = colnames(myValues$DF)[1])
+  #tmpgroups = unique(myValues$DF$Conditions)
+
+  tmpgroups = input$sel_groups
+  tmpgroups = unlist(lapply(tmpgroups, function(x) {levels(myValues$DF[,x])}))
+  
+  updateSelectizeInput(session,'sel_factors',
+                           choices=tmpgroups, selected=tmpgroups, server = T)
   
   
 })
@@ -16,41 +33,29 @@ observe({
 
 geneExrReactive <- reactive({
 
-  # if(input$genBoxplot > 0)
-  # {
-  #   isolate({
+
       validate(need(length(input$sel_gene)>0,"Please select a gene."))
-      validate(need(length(input$sel_group)>0,"Please select group(s)."))
-      
-      # if(input$counttype == "counts")
-      #   counts = as.data.frame(counts(myValues$dds))
-      # if(input$counttype == "rlog")
-      #   counts = as.data.frame(myValues$rlogMat)
-      # if(input$counttype == "vst")
-      #   counts = as.data.frame(myValues$vstMat)
+      validate(need(length(input$sel_groups)>0,"Please select a group(s)."))
+      validate(need(length(input$sel_factors)>0,"Please select factors."))
       
       
-      # counts$genes = as.character(rownames(counts))
-      # 
-      # countlong = reshape2::melt(counts,variable.name = "sampleid",value.name="count")
-      # 
-      # samples <- myValues$DF
-      # countlong$group = unlist(lapply(countlong$sampleid, function(x){
-      #   samples[samples$Samples == x,]$Conditions
-      # }))
-      
-      # countlong$group = gsub("_[0-9]+","",countlong$sampleid)
-      
-      countlong = myValues$boxplotData
-      
-      filtered = countlong[countlong$genes %in% input$sel_gene,]
-      filtered = filtered[filtered$group %in% input$sel_group,]
+      filtered <- t(log2((counts(myValues$dds[input$sel_gene, ], normalized=TRUE, replaced=FALSE)+.5))) %>%
+           merge(colData(myValues$dds), ., by="row.names") %>%
+           gather(gene, expression, (ncol(.)-length(input$sel_gene)+1):ncol(.))
       
       
-      return(filtered)
-  #   })
-  # }
-  #     
+      factors = input$sel_groups
+      
+      
+      filtered_new = filtered
+      for(i in 1:length(factors))
+      {
+        f = factors[i]
+        filtered_new = inner_join(filtered_new, filtered[filtered[,f] %in% input$sel_factors,])
+      }
+      
+      return(filtered_new)
+ 
     
 })
 
@@ -59,32 +64,19 @@ output$boxPlot <- renderPlotly({
   {
     filtered = geneExrReactive()
     
-    if(input$counttype == "counts")
-      filtered$y = filtered$count
-    if(input$counttype == "rlog")
-      filtered$y = filtered$rlog
-    if(input$counttype == "vst")
-      filtered$y = filtered$vst
+    validate(need(length(input$boxplotX)>0,"Please select a group."))
+    validate(need(length(input$boxplotFill)>0,"Please select a fill by group."))
     
     ## Adapted from STARTapp dotplot
     
-    p <- ggplot(filtered,aes(x=group,y=y,fill=group)) + geom_boxplot()
+    p <- ggplot(filtered, aes_string(input$boxplotX, "expression", fill=input$boxplotFill)) + 
+      geom_boxplot() + facet_wrap(~gene, scales="free_y")
     
-    p <- p + facet_grid(.~ genes,scales = "free_y")+
-      geom_point(size=3,aes(text = paste("group:", group))) + 
-      stat_summary(fun.y=mean,geom="point",shape=5,size=3,fill=1)
     
-    countlong = myValues$boxplotData
-    
-    sel_group = as.character(unique(countlong$group))
-    p <- p + scale_fill_discrete(name="group",breaks=sel_group,
-                                 labels=sel_group,
-                                 guide=guide_legend(keyheight=4,keywidth=2))
-    
-    p <- p + theme_base() + ylab(" ") + xlab(" ")+theme(
+    p <- p + xlab(" ") + theme(
       plot.margin = unit(c(1,1,1,1), "cm"),
       axis.text.x = element_text(angle = 45),
-      legend.position="bottom")+theme(legend.position="none")
+      legend.position="bottom")
     
     p
     
@@ -108,13 +100,13 @@ output$boxplotComputed <- reactive({
 outputOptions(output, 'boxplotComputed', suspendWhenHidden=FALSE)
 
 
-# output$downloadBoxCsv <- downloadHandler(
-#   
-#   filename = function() {paste0(input$condition1,"_vs_",input$condition2,".csv")},
-#   content = function(file) {
-#     csv = geneExrReactive()
-#     
-#     write.csv(csv, file, row.names=F)
-#   }
-#   
-# )
+output$downloadBoxCsv <- downloadHandler(
+
+  filename = function() {paste0(input$boxplotX,"_",input$boxplotFill,"_boxplotdata.csv")},
+  content = function(file) {
+    csv = geneExrReactive()
+
+    write.csv(csv, file, row.names=F)
+  }
+
+)

@@ -145,11 +145,11 @@ Various **visualizations** and **output data** are included:
 
 - The first column should have gene names/ids followed by columns for sample counts. The file can be either **comma or tab delimited**
 
-- If your counts are not merged, you can use this <a href="http://nasqar.abudhabi.nyu.edu/countMerger">Count Merger</a> to consolidate all your sample count files
+- If your counts are not merged, you can use this <a href="http://nasqar.abudhabi.nyu.edu/GeneCountMerger">Count Merger</a> to consolidate all your sample count files
 
-- If samples contain **replicates**, they should be denoted by **underscore** and the replicate number (see **figure 2**)
+- For convenience, if this is a simple factor experiment and samples contain **replicates** and sample names are denoted by **underscore** and the replicate number (see **figure 2**), then the conditions will be automatically set by parsing the samples/replicate numbers
 
-- If no replicates, then select **No replicates** option to help set the default experiment conditions for the next step
+- If no replicates, then select **No replicates** option to help set the default experiment conditions for the next step. This is necessary because newer versions of DESeq2 (> 1.22.0) do not work on experiments with no replicates. See  <a href="https://bioconductor.riken.jp/packages/3.8/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#can-i-use-deseq2-to-analyze-a-dataset-without-replicates" target="_blank">here</a> for more details
 
 - Avoid using special characters or spaces in sample names (**figure 1**), other than underscores to denote replicates (**figure 2**)
 
@@ -157,8 +157,9 @@ Various **visualizations** and **output data** are included:
 
 - Prefilter: You can also set a minimum number of counts per gene to include
 
-- For a sample file, download and view <a href="www/sampleCounts.csv" target="_blank">this</a> file
+- For a simple-factor experiment sample counts file, download and view <a href="www/sampleCounts.csv" target="_blank">this</a> file
 
+- For a multi-factor experiment example file, download and view <a href="www/chenCounts.csv" target="_blank">this</a>  counts file and the following <a href="www/chenMeta.csv" target="_blank">metadata file</a>.
 
 <div class="col-md-6">
 <p><strong>figure 1 (No Replicates)</strong></p>

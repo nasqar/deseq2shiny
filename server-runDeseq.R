@@ -3,14 +3,21 @@ observe({
 })
 
 
-  ddsReactive <- reactive({
+  ddsReactive <- eventReactive(input$run_deseq2, {
     
-    if(input$run_deseq2 > 0)
-    {
+    # if(input$run_deseq2 > 0)
+    # {
       withProgress(message = "Running DESeq2 , please wait",{
         
         removeNotification("errorNotify")
         removeNotification("errorNotify1")
+        shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+        shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
+        shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+
+        shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
+        shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
+        shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
         
         myValues$status = NULL
         myValues$dds = NULL
@@ -18,20 +25,55 @@ observe({
         #shinyjs::show(selector = "a[data-value=\"deseqTab\"]")
         js$addStatusIcon("conditionsTab","loading")
         
-        
-        
-        
+        myValues$DF = hot_to_r(input$table)
+      
         samples <- myValues$DF
         dataCounts <- myValues$dataCounts
         
         rownames(samples) = samples$Samples
         samples$Samples = NULL
         
+        # convert factors to unordered
+        #factor(samples, ordered = F)
+        
+        
+        for (i in 1:ncol(samples)) {
+          if(all(class(samples[,i]) %in% c("ordered","factor")))
+            samples[,i] = factor(samples[,i], ordered = F)
+        }
+        
         isolate({
-          if(input$no_replicates)
-            dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = ~ 1)
-          else
-            dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = ~ Conditions)
+          # if(input$no_replicates)
+          #   dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = ~ 1)
+          # else
+          #   dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = ~ Conditions)
+          validate(need(
+            tryCatch({
+                  dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = as.formula(input$designFormula))
+            },
+            error = function(e)
+            {
+              myValues$status = paste("DESeq2 Error: ",e$message)
+              
+              showNotification(id="errorNotify", myValues$status, type = "error", duration = NULL)
+              showNotification(id="errorNotify1", "Fix design formula OR Factors/Conditions", type = "error", duration = NULL)
+              
+              # shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+              # shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
+              # shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+              # 
+              # shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
+              # shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
+              # shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
+              
+              js$addStatusIcon("conditionsTab","fail") 
+            }
+            ),
+            "Error"
+          )) 
+            
+          
+          
         })
         
         shiny::setProgress(value = 0.2, detail = "...")
@@ -49,17 +91,17 @@ observe({
             myValues$status = paste("DESeq2 Error: ",e$message)
             
             showNotification(id="errorNotify", myValues$status, type = "error", duration = NULL)
-            showNotification(id="errorNotify1", "If this is intended, please select 'No Replicates' in Input Data step.", type = "error", duration = NULL)
+            showNotification(id="errorNotify1", "If this is intended, please select 'No Replicates' in Input Data step. OR use ~ 1 as the design formula", type = "error", duration = NULL)
             
-            shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
-            shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
-            shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+            # shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+            # shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
+            # shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+            # 
+            # shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
+            # shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
+            # shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
             
-            shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
-            shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
-            shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
-            
-            js$addStatusIcon("conditionsTab","done")
+            js$addStatusIcon("conditionsTab","fail")
             
             return(NULL)
           }),
@@ -98,23 +140,30 @@ observe({
         flatVst$genes = rownames(flatVst)
         flatVst = reshape2::melt(flatVst,variable.name = "sampleid",value.name="vst")
         flatVst = flatVst[order(flatVst$genes,flatVst$sampleid),]
+        #browser()
+        countsNorm = as.data.frame(log2((counts(dds, normalized = T) +.5)))
+        countsNorm$genes = rownames(countsNorm)
+        countlongNorm = reshape2::melt(countsNorm,variable.name = "sampleid",value.name="count")
+        countlongNorm = countlongNorm[order(countlongNorm$genes,countlongNorm$sampleid),]
         
-        boxplotData = countlong
-        boxplotData$rlog = flatRlog$rlog
-        boxplotData$vst = flatVst$vst
+        # boxplotData = countlongNorm
+        # boxplotData$rlog = flatRlog$rlog
+        # boxplotData$vst = flatVst$vst
         
         samples <- myValues$DF
         
         # faster code
-        new = boxplotData
-        new[] <- lapply(boxplotData, function(x) samples$Conditions[match(x, samples$Samples)])
-        boxplotData$group = as.character(new$sampleid)
+        # new = boxplotData
+        # new[] <- lapply(boxplotData, function(x) samples$Conditions[match(x, rownames(samples))])
+        # boxplotData$group = as.character(new$sampleid)
+        
+        
         
         # boxplotData$group = unlist(lapply(boxplotData$sampleid, function(x){
         #   samples[samples$Samples == x,]$Conditions
         # }))
         
-        myValues$boxplotData = boxplotData
+        # myValues$boxplotData = boxplotData
         
         shiny::setProgress(value = 1, detail = "...")
         
@@ -129,17 +178,38 @@ observe({
         #shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
         
         
-        updateSelectInput(session,"condition1" ,choices = myValues$DF$Conditions)
-        updateSelectInput(session,"condition2" ,choices = myValues$DF$Conditions)
+        updateSelectizeInput(session, "resultNamesInput", choices = resultsNames(dds), selected = "Intercept")
+        updateSelectizeInput(session, "factorNameInput", choices = colnames(myValues$DF), selected = colnames(myValues$DF)[1])
+        
+        choices = colnames(colData(dds))[ !colnames( colData(dds)) %in% c("replaceable")]
+        updateSelectInput(session, "rlogIntGroupsInput", choices = choices, selected = choices[1])
+        updateSelectInput(session, "vsdIntGroupsInput", choices = choices, selected = choices[1])
+        
+        #updateSelectInput(session, "boxPlotGroupsInput", choices = names(colData(dds)), selected = names(colData(dds))[1])
+        # updateSelectInput(session,"condition1" ,choices = myValues$DF$Conditions)
+        # updateSelectInput(session,"condition2" ,choices = myValues$DF$Conditions)
         
         js$addStatusIcon("conditionsTab","done")
       })
       
-    }
+    #}
     
 
   })
+  
+  observeEvent(input$factorNameInput, {
+    
+    if(input$factorNameInput != "")
+    {
+      updateSelectInput(session,"condition1" ,choices = levels(myValues$DF[,input$factorNameInput]))
+      updateSelectInput(session,"condition2" ,choices = levels(myValues$DF[,input$factorNameInput]))
+    }
+    
+    
+    
+  },ignoreInit = T)
 
+  
   output$rlogData <- renderDataTable({
     if(!is.null(myValues$rlogMat))
     {
@@ -167,42 +237,16 @@ observe({
 
   })
   
-  
-  # observe({
-  #   rlogPlotReactive()
-  # })
-  # rlogPlotReactive <- reactive({
-  #   if(!is.null(myValues$rlogMat))
-  #   {
-  #     sampleDists <- dist(t(myValues$rlogMat))
-  # 
-  #     sampleDistMatrix <- as.matrix(sampleDists)
-  #     rownames(sampleDistMatrix) <- paste(myValues$rldColNames)
-  #     colnames(sampleDistMatrix) <- NULL
-  #     colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-  #     pheatmap(sampleDistMatrix,clustering_distance_rows=sampleDists,clustering_distance_cols=sampleDists,col=colors,filename = "rlogheatmap.png")
-  # 
-  #     return(list(
-  #       src = paste0("rlogheatmap.png"),
-  #       filetype = "image/png",
-  #       alt = "pathview image"
-  #     ))
-  #   }
-  # })
-  # 
-  # 
-  # 
-  # output$rlogPlot <- renderPlot({
-  #   rlogPlotReactive()
-  # })
-
   output$rlogPcaPlot <- renderPlotly({
-    if(!is.null(myValues$rld))
-    {
-      DESeq2::plotPCA(myValues$rld, intgroup = c("Conditions"))
-    }
-
-
+      if(!is.null(myValues$rld))
+      {
+        intgroups = input$rlogIntGroupsInput
+        if(is.null(intgroups) | intgroups == "")
+          intgroups = names(colData(myValues$dds))[1]
+          
+        DESeq2::plotPCA(myValues$rld, intgroup = intgroups)
+      }
+    
   })
 
   
@@ -227,18 +271,19 @@ observe({
   output$vsdPcaPlot <- renderPlotly({
     if(!is.null(myValues$vsd))
     {
-      DESeq2::plotPCA(myValues$vsd, intgroup = c("Conditions"))
+      intgroups = input$vsdIntGroupsInput
+      if(is.null(intgroups) | intgroups == "")
+        intgroups = names(colData(myValues$dds))[1]
+      
+      DESeq2::plotPCA(myValues$vsd, intgroup = intgroups)
     }
-    
     
   })
   
   output$vsdData <- renderDataTable({
     if(!is.null(myValues$vstMat))
     {
-      
       myValues$vstMat
-      
     }
   }, 
   options = list(scrollX = TRUE, pageLength = 5))
