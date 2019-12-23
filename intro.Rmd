@@ -10,11 +10,13 @@ runtime: shiny
 
 ---
 
-This Shiny app is a wrapper around **DESeq2**, an R package for **"Differential gene expression analysis based on the negative binomial distribution".**
+This Shiny app is a wrapper around <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a>, an R package for **"Differential gene expression analysis based on the negative binomial distribution".**
 
 It is meant to provide an intuitive interface for researchers to easily **upload, analyze, visualize, and explore RNAseq count data** interactively with no prior programming knowledge in R.
 
-For details on this package, see <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">documentation</a>
+This tool supports **simple or multi-factorial** experimental design. It also allows for exploratory analysis when no replicates are available.
+
+For details on how this package is used for RNASeq count data analysis and visualization, see <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" target="_blank">documentation</a>
 <div class="row"><hr style="border-style:none;"/></div>
 ## Features
 ---
@@ -130,14 +132,14 @@ Various **visualizations** and **output data** are included:
 
 ---
 
-### 1. Example data (Demo)
+### 1. Example data (simple/multi-factorial experiment)
 
-- For demo purposes, you can select "Example data" and carry out the analysis to get familiar with the app
+- It is recommended for the user to try oneor both of the pre-loaded example data sets to carry out the analysis and get familiar with the app. Then the user should be able to replicate the analysis on their own datasets.
 
-- That will automatically load the **Tissue Comparison Data (Human)** that belongs to <a href="https://www.ncbi.nlm.nih.gov/pubmed?term=18978772" target="_blank">this published work</a>
+- The **simple factorial example** loads the **Tissue Comparison Data (Human)** (RNASeq counts) that belongs to <a href="https://www.ncbi.nlm.nih.gov/pubmed?term=18978772" target="_blank">this published study</a>
 
-- The data can be found <a href="http://bowtie-bio.sourceforge.net/recount/" target="_blank">here</a>
-<div class="row"><hr style="border-style:none;"/></div>
+- The **multi-factorial example** loads the **Mouse Data** (RNASeq counts and experiment design metadata) that belongs to <a href="https://doi.org/10.1038/ni.2710" target="_blank">this published study</a>
+
 
 ### 2. Upload your own data (gene counts)
 
@@ -145,7 +147,7 @@ Various **visualizations** and **output data** are included:
 
 - The first column should have gene names/ids followed by columns for sample counts. The file can be either **comma or tab delimited**
 
-- If your counts are not merged, you can use this <a href="http://nasqar.abudhabi.nyu.edu/GeneCountMerger">Count Merger</a> to consolidate all your sample count files
+- If your counts are not merged, you can use this <a href="http://nasqar.abudhabi.nyu.edu/GeneCountMerger">Gene Count Merger</a> to consolidate all your sample count files
 
 - For convenience, if this is a simple factor experiment and samples contain **replicates** and sample names are denoted by **underscore** and the replicate number (see **figure 2**), then the conditions will be automatically set by parsing the samples/replicate numbers
 
@@ -157,9 +159,10 @@ Various **visualizations** and **output data** are included:
 
 - Prefilter: You can also set a minimum number of counts per gene to include
 
-- For a simple-factor experiment sample counts file, download and view <a href="sampleCounts.csv" target="_blank">this</a> file
+- For a **simple-factor experiment** sample counts file, download and view <a href="sampleCounts.csv" target="_blank">this</a> file
 
-- For a multi-factor experiment example file, download and view <a href="chenCounts.csv" target="_blank">this</a>  counts file and the following <a href="chenMeta.csv" target="_blank">metadata file</a>.
+- For a **multi-factorial experiment** example file, download and view <a href="chenCounts.csv" target="_blank">this</a>  counts file and the following <a href="chenMeta.csv" target="_blank">metadata file</a>. 
+- Experimental design meta data can either be uploaded as a csv file, or constructed in-page with in the "Edit Conditions" step
 
 <div class="col-md-6">
 <p><strong>figure 1 (No Replicates)</strong></p>
