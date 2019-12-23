@@ -185,6 +185,8 @@ observe({
         updateSelectInput(session, "rlogIntGroupsInput", choices = choices, selected = choices[1])
         updateSelectInput(session, "vsdIntGroupsInput", choices = choices, selected = choices[1])
         
+        disable("data_file_type")
+        disable("no_replicates")
         #updateSelectInput(session, "boxPlotGroupsInput", choices = names(colData(dds)), selected = names(colData(dds))[1])
         # updateSelectInput(session,"condition1" ,choices = myValues$DF$Conditions)
         # updateSelectInput(session,"condition2" ,choices = myValues$DF$Conditions)

@@ -131,10 +131,14 @@ csvDataReactive <- eventReactive(input$submit,{
   
   sampleN = colnames(fileContent)
   
-  #updateTextInput(session,"designFormula",value = "~ 1")
+  sampleConditions = strsplit(sampleN,"_")
+  #sampleConditions = unlist(sampleConditions)
+  sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
   
+  if(length(unique(sampleConditions)) == length(sampleN))
+    updateCheckboxInput(session, "no_replicates", value = T)
   
-  if(input$no_replicates)
+  if(input$no_replicates || length(unique(sampleConditions)) == length(sampleN))
   {
     sampleConditions = sampleN
     #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
