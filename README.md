@@ -1,4 +1,4 @@
-# DESeq2Shiny: Shiny app that wraps the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a> R package for "Differential gene expression analysis based on the negative binomial distribution".
+# DESeq2Shiny: Shiny app that wraps the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a> R package
 
 ### Introduction
 ---
