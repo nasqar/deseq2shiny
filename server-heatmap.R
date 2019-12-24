@@ -105,10 +105,12 @@ output$heatmapPlot <- renderPlot({
     {
       annLegend = T
       Rowv = NA
-      annCol <- as.data.frame(coldata[, colnames(coldata)[ !colnames( coldata) %in% c("sizeFactor","replaceable")]] )
+      
+      annCols = colnames(coldata)[ !colnames( coldata) %in% c("sizeFactor","replaceable")]
+      annCol <- as.data.frame(coldata[, annCols] )
       
     }
-     
+    
     aheatmap(logNormCounts,scale = "none",
                   revC=TRUE,
                   fontsize = 10,

@@ -131,44 +131,86 @@ csvDataReactive <- eventReactive(input$submit,{
   
   sampleN = colnames(fileContent)
   
-  sampleConditions = strsplit(sampleN,"_")
-  #sampleConditions = unlist(sampleConditions)
-  sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
-  
-  if(length(unique(sampleConditions)) == length(sampleN))
-    updateCheckboxInput(session, "no_replicates", value = T)
-  
-  if(input$no_replicates || length(unique(sampleConditions)) == length(sampleN))
+  if(identical(input$data_file_type,"countsFile"))
   {
-    sampleConditions = sampleN
-    #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
-    samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
-    
-  }
-  else
-  {
-    if(identical(input$data_file_type,"examplecountsfactors"))
+    if(input$no_replicates )
     {
-      samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
+      sampleConditions = sampleN
+      
+      samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
       
     }
     else
     {
+      
       sampleConditions = strsplit(sampleN,"_")
-      #sampleConditions = unlist(sampleConditions)
+      
       sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
       
-      #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
       samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
-      #updateTextInput(session,"designFormula",value = "~ Conditions")
+      
+    
     }
+  
+  }
+  
+  else if(identical(input$data_file_type,"examplecounts"))
+  {
+    updateCheckboxInput(session, "no_replicates", value = T)
     
     
-    
+    sampleConditions = sampleN
+    #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
+    samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
+  }
+  else
+  {
+    samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
   }
   
   
-  #myValues$countsData = fileContent
+  
+  
+  # sampleConditions = strsplit(sampleN,"_")
+  # #sampleConditions = unlist(sampleConditions)
+  # sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
+  # 
+  # 
+  # if(length(unique(sampleConditions)) == length(sampleN) )
+  #   updateCheckboxInput(session, "no_replicates", value = T)
+  # 
+  # 
+  # 
+  # if((input$no_replicates || length(unique(sampleConditions)) == length(sampleN)) && !identical(input$data_file_type,"examplecountsfactors"))
+  # {
+  #   sampleConditions = sampleN
+  #   #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
+  #   samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
+  #   
+  # }
+  # else
+  # {
+  #   if(identical(input$data_file_type,"examplecountsfactors"))
+  #   {
+  #     samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
+  #     
+  #   }
+  #   else
+  #   {
+  #     sampleConditions = strsplit(sampleN,"_")
+  #     #sampleConditions = unlist(sampleConditions)
+  #     sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
+  #     
+  #     #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
+  #     samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
+  #     #updateTextInput(session,"designFormula",value = "~ Conditions")
+  #   }
+  #   
+  #   
+  #   
+  # }
+  
+  
   
   myValues$DF = samples
   updateDesignFormula()

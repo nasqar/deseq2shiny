@@ -6,7 +6,7 @@ tabItem(tabName = "inputdata",
                      h4("(select .CSV)"),
                      radioButtons('data_file_type','Use example file or upload your own data',
                                   c(
-                                    'Upload Counts File (single-factor)'="countsFile",
+                                    'Upload Counts File'="countsFile",
                                     'Example Data (single-factor)'="examplecounts",
                                     'Example Data (multi-factor)'='examplecountsfactors'
                                   ),selected = "countsFile"),
