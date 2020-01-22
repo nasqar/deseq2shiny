@@ -13,6 +13,9 @@ This tool supports **simple or multi-factorial** experimental design. It also al
 ### Online/Demo:
 You can try it online at http://nasqar.abudhabi.nyu.edu/deseq2shiny
 
+### Pre-print:
+[NASQAR: A web-based platform for High-throughput sequencing data analysis and visualization](https://doi.org/10.1101/709980)
+
 ### Features
 ---
 Various **visualizations** and **output data** are included:
