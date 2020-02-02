@@ -28,29 +28,32 @@ tabItem(tabName = "conditionsTab",
           )
         ),
         conditionalPanel("(output.ddsComputed && input.run_deseq2 > 0) || (!output.ddsComputed && input.run_deseq2 < 1) || output.deseqError",
-                         box(title = "Design Formula", solidHeader = T, status = "primary",width = 10,
+                         
+                         column(9,
+                         box(title = "Design Formula", solidHeader = T, status = "primary",width = 12,
                              wellPanel(
                                textInput("designFormula","Design Formula:", placeholder = "~ Conditions")
                              )
                             )
                          ,
+                        
                          
-                         box(
-                           title = "Run",
-                           solidHeader = T,
-                           status = "success",
-                           width = 2,
-                           
-                           actionButton("run_deseq2", "Run DESeq2", class = "btn btn-success",
-                                        style = "width:100%;height:60px;")
-                         )
-                         ,
+                         # box(
+                         #   title = "Run",
+                         #   solidHeader = T,
+                         #   status = "success",
+                         #   width = 2,
+                         #   
+                         #   actionButton("run_deseq2", "Run DESeq2", class = "btn btn-success",
+                         #                style = "width:100%;height:60px;")
+                         # )
+                         # ,
                          
                            box(
                              title = "Conditions/Factors",
                              solidHeader = T,
                              status = "primary",
-                             width = 10,
+                             width = 12,
                              h4(strong("Option 1) Edit Table: ")),
                              column(
                                8,
@@ -115,6 +118,21 @@ tabItem(tabName = "conditionsTab",
                          
                          ,
                          tags$div(class = "clearBoth")
+                         
+        ),
+        column(3,
+               box(title = "Run DESeq2", solidHeader = T, status = "success",width = 12,
+                   wellPanel(
+                     checkboxInput("computeVST","Compute VST transfomation", value = T),
+                     checkboxInput("computeRlog","Compute RLog transfomation (may take a long time)", value = F)
+                   ),
+                   actionButton("run_deseq2", "Run DESeq2", class = "btn btn-success",
+                                style = "width:100%;height:60px;")
+               )
+               
+               )
+        ,
+        tags$div(class = "clearBoth")
         )
         )#fluidrow
         

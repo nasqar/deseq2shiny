@@ -110,15 +110,25 @@ observe({
         
         BiocParallel::register(SerialParam())
         
-        shiny::setProgress(value = 0.4, detail = "Calculating rlog matrix ...")
         
-        rld <- rlog(dds)
-        myValues$rld <- rld
-        myValues$rlogMat <- assay(rld)
         
-        myValues$rldColNames <- colnames(rld)
+        if(input$computeRlog)
+        {
+          shiny::setProgress(value = 0.4, detail = "Calculating RLog transformation ...")
+          rld <- rlog(dds)
+          myValues$rld <- rld
+          myValues$rlogMat <- assay(rld)
+          
+          myValues$rldColNames <- colnames(rld)
+          
+          # flatRlog = as.data.frame(myValues$rlogMat)
+          # flatRlog$genes = rownames(flatRlog)
+          # flatRlog = reshape2::melt(flatRlog,variable.name = "sampleid",value.name="rlog")
+          # flatRlog = flatRlog[order(flatRlog$genes,flatRlog$sampleid),]
+        }
         
-        shiny::setProgress(value = 0.6, detail = "Variance Stabilizing Transformation ...")
+        
+        shiny::setProgress(value = 0.6, detail = "Computing Variance Stabilizing Transformation ...")
         
         vsd <- varianceStabilizingTransformation(dds)
         myValues$vsd <- vsd
@@ -126,44 +136,27 @@ observe({
         
         shiny::setProgress(value = 0.7, detail = "Formatting data ...")
         
-        counts = as.data.frame(counts(dds))
-        counts$genes = rownames(counts)
-        countlong = reshape2::melt(counts,variable.name = "sampleid",value.name="count")
-        countlong = countlong[order(countlong$genes,countlong$sampleid),]
+        # counts = as.data.frame(counts(dds))
+        # counts$genes = rownames(counts)
+        # countlong = reshape2::melt(counts,variable.name = "sampleid",value.name="count")
+        # countlong = countlong[order(countlong$genes,countlong$sampleid),]
+        # 
+        # 
+        # 
+        # flatVst = as.data.frame(myValues$vstMat)
+        # flatVst$genes = rownames(flatVst)
+        # flatVst = reshape2::melt(flatVst,variable.name = "sampleid",value.name="vst")
+        # flatVst = flatVst[order(flatVst$genes,flatVst$sampleid),]
+        # 
+        # countsNorm = as.data.frame(log2((counts(dds, normalized = T) +.5)))
+        # countsNorm$genes = rownames(countsNorm)
+        # countlongNorm = reshape2::melt(countsNorm,variable.name = "sampleid",value.name="count")
+        # countlongNorm = countlongNorm[order(countlongNorm$genes,countlongNorm$sampleid),]
         
-        flatRlog = as.data.frame(myValues$rlogMat)
-        flatRlog$genes = rownames(flatRlog)
-        flatRlog = reshape2::melt(flatRlog,variable.name = "sampleid",value.name="rlog")
-        flatRlog = flatRlog[order(flatRlog$genes,flatRlog$sampleid),]
-        
-        flatVst = as.data.frame(myValues$vstMat)
-        flatVst$genes = rownames(flatVst)
-        flatVst = reshape2::melt(flatVst,variable.name = "sampleid",value.name="vst")
-        flatVst = flatVst[order(flatVst$genes,flatVst$sampleid),]
-        #browser()
-        countsNorm = as.data.frame(log2((counts(dds, normalized = T) +.5)))
-        countsNorm$genes = rownames(countsNorm)
-        countlongNorm = reshape2::melt(countsNorm,variable.name = "sampleid",value.name="count")
-        countlongNorm = countlongNorm[order(countlongNorm$genes,countlongNorm$sampleid),]
-        
-        # boxplotData = countlongNorm
-        # boxplotData$rlog = flatRlog$rlog
-        # boxplotData$vst = flatVst$vst
-        
-        samples <- myValues$DF
-        
-        # faster code
-        # new = boxplotData
-        # new[] <- lapply(boxplotData, function(x) samples$Conditions[match(x, rownames(samples))])
-        # boxplotData$group = as.character(new$sampleid)
+        # samples <- myValues$DF
         
         
         
-        # boxplotData$group = unlist(lapply(boxplotData$sampleid, function(x){
-        #   samples[samples$Samples == x,]$Conditions
-        # }))
-        
-        # myValues$boxplotData = boxplotData
         
         shiny::setProgress(value = 1, detail = "...")
         
@@ -173,9 +166,10 @@ observe({
         shinyjs::show(selector = "a[data-value=\"resultsTab\"]")
         shinyjs::show(selector = "a[data-value=\"heatmapTab\"]")
         shinyjs::show(selector = "a[data-value=\"vstTab\"]")
-        shinyjs::show(selector = "a[data-value=\"rlogTab\"]")
         
-        #shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+        if(input$computeRlog)
+          shinyjs::show(selector = "a[data-value=\"rlogTab\"]")
+        
         
         
         updateSelectizeInput(session, "resultNamesInput", choices = resultsNames(dds), selected = "Intercept")

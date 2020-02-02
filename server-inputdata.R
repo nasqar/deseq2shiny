@@ -14,6 +14,7 @@ observe({
   shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
   shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
   
+  shinyjs::disable("computeVST")
   # Check if example selected, or if not then ask to upload a file.
   
   # shiny:: validate(
