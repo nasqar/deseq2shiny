@@ -75,7 +75,6 @@ ui <- tagList(
           tabItems(
             source("ui-tab-intro.R",local=TRUE)$value,
             source("ui-tab-inputdata.R",local=TRUE)$value,
-            source("ui-tab-preproc.R",local=TRUE)$value,
             
             source("ui-tab-conditions.R",local=TRUE)$value,
             source("ui-tab-svaseq.R",local=TRUE)$value,
