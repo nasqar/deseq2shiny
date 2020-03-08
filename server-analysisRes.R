@@ -5,36 +5,45 @@ observe({
 compareReactive <- reactive({
   if(input$getDiffResVs > 0)
   {
-    isolate({
-      factorsStr = "Intercept: no replicates"
-      if(input$no_replicates)
-      {
-        
-        myValues$vsResults <- results(myValues$dds)
-      }
-        
-      else{
-        if(input$resultNameOrFactor == 'Result Names')
+    
+    withProgress(message = "Getting DESeq results , please wait ...",{
+      isolate({
+        factorsStr = "Intercept: no replicates"
+        if(input$no_replicates)
         {
-          validate(
-            need((length(input$resultNamesInput) > 0 & length(input$resultNamesInput) < 3), message = "Need to chooise at least 1 (Max. 2)")
-          )
           
-          myValues$vsResults <- results(myValues$dds,contrast=list(input$resultNamesInput))
-          factorsStr = paste(list(input$resultNamesInput))
+          myValues$vsResults <- results(myValues$dds)
         }
-        else if(input$resultNameOrFactor == 'Factors')
-        {
-          validate(
-            need((input$condition1 != input$condition2) , message = "condition 1 must be different from condition 2")
-          )
-          
-          myValues$vsResults <- results(myValues$dds,contrast=c(input$factorNameInput,input$condition1,input$condition2))
-          factorsStr = paste(input$factorNameInput, " : ", input$condition1,input$condition2)
+        
+        else{
+          if(input$resultNameOrFactor == 'Result Names')
+          {
+            validate(
+              need((length(input$resultNamesInput) > 0 & length(input$resultNamesInput) < 3), message = "Need to choose at least 1 (Max. 2)")
+            )
+            js$addStatusIcon("resultsTab","loading")
+            
+            myValues$vsResults <- results(myValues$dds,contrast=list(input$resultNamesInput))
+            factorsStr = paste(list(input$resultNamesInput))
+          }
+          else if(input$resultNameOrFactor == 'Factors')
+          {
+            validate(
+              need((input$condition1 != input$condition2) , message = "condition 1 must be different from condition 2")
+            )
+            js$addStatusIcon("resultsTab","loading")
+            
+            myValues$vsResults <- results(myValues$dds,contrast=c(input$factorNameInput,input$condition1,input$condition2))
+            factorsStr = paste(input$factorNameInput, " : ", input$condition1,input$condition2)
+          }
         }
-      }
+        
+        
+        js$addStatusIcon("resultsTab","done")
+        
+        return(list('results'=myValues$vsResults, 'conditions'=factorsStr))
+      })
       
-      return(list('results'=myValues$vsResults, 'conditions'=factorsStr))
     })
     
   }

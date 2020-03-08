@@ -17,7 +17,7 @@ library(sodium)
 library(NMF)
 library(tidyr)
 library(dplyr)
-
+library(sva)
 
 appCSS <- "
 #loading-content {
@@ -49,8 +49,10 @@ ui <- tagList(
           sidebarMenu(id = "tabs",
                       menuItem("0. User Guide", tabName = "introTab", icon = icon("info-circle")),
                       menuItem("1. Input Data", tabName = "inputdata", icon = icon("upload")),
-                      menuItem("2. Run DESeq2", tabName = "conditionsTab", icon = icon("th")),
-                      menuItem("   Running DESeq2", tabName = "deseqTab", icon = icon("bar-chart")),
+                      menuItem("2. Design Conditions", tabName = "conditionsTab"),
+                      menuItem("3a. Hidden Batch Effect", tabName = "svaseqTab"),
+                      menuItem("3. Run DESeq2", tabName = "deseqTab"),
+                      
                       menuItem("   Rlog", tabName = "rlogTab", icon = icon("bar-chart")),
                       menuItem("   VST", tabName = "vstTab", icon = icon("bar-chart")),
                       menuItem("   DE Results", tabName = "resultsTab", icon = icon("bar-chart")),
@@ -73,7 +75,11 @@ ui <- tagList(
           tabItems(
             source("ui-tab-intro.R",local=TRUE)$value,
             source("ui-tab-inputdata.R",local=TRUE)$value,
+            source("ui-tab-preproc.R",local=TRUE)$value,
+            
             source("ui-tab-conditions.R",local=TRUE)$value,
+            source("ui-tab-svaseq.R",local=TRUE)$value,
+            
             source("ui-tab-deseq.R",local = TRUE)$value,
             source("ui-tab-rlog.R",local = TRUE)$value,
             source("ui-tab-vst.R",local = TRUE)$value,

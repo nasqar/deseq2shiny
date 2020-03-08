@@ -10,6 +10,8 @@ server <- function(input, output, session) {
   
   source("server-conditions.R",local = TRUE)
   
+  source("server-svaseq.R",local = TRUE)
+  
   source("server-runDeseq.R",local = TRUE)
   
   source("server-analysisRes.R",local = TRUE)
@@ -18,6 +20,12 @@ server <- function(input, output, session) {
   
   source("server-heatmap.R",local = TRUE)
   
+  GotoTab <- function(name){
+    
+    shinyjs::show(selector = paste0("a[data-value=\"",name,"\"]"))
+    
+    shinyjs::runjs("window.scrollTo(0, 0)")
+  }
 }
 
 

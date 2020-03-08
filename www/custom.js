@@ -3,7 +3,8 @@ shinyjs.addStatusIcon = function(params)
   var tabname = params[0];
   var status = params[1];
   
-  var menuitem = $('.sidebar-menu > li > a[data-value="' + tabname +'"]');
+  //var menuitem = $('.sidebar-menu > li > a[data-value="' + tabname +'"]');
+  var menuitem = $('ul > li > a[data-value="' + tabname +'"]');
   
     menuitem.children('#loading-bar-spinner').remove();
     menuitem.children('#checkmarkdone').remove();

@@ -16,6 +16,8 @@ It is meant to provide an intuitive interface for researchers to easily **upload
 
 This tool supports **simple or multi-factorial** experimental design. It also allows for exploratory analysis when no replicates are available.
 
+The app also provides svaseq **Surrogate Variable Analysis** for **hidden batch** effect detection. The user can then include Surrogate Variables (SVs) as adjustment factors for downstream analysis (eg. differential expression). For more information on svaseq, go to<a href="https://www.bioconductor.org/packages/devel/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#using-sva-with-deseq2" target="_blank"> this link</a>
+
 For details on how this package is used for RNASeq count data analysis and visualization, see <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" target="_blank">documentation</a>
 <div class="row"><hr style="border-style:none;"/></div>
 ## Features
@@ -87,6 +89,40 @@ Various **visualizations** and **output data** are included:
 
    </div>
   </div>
+  
+  <hr/>
+  
+     <div class="col-md-6">
+    <div class="row BoxArea5">
+      <ul>
+         <li>
+            <p><strong>Surrogate Variable Analysis</strong></p>
+            <ul>
+               <li>SV plots</li>
+               <li>PCA plots</li>
+            </ul>
+         </li>
+      </ul>
+      <hr/>
+      <div class="col-md-2" style="width: 50%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/svplot.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+      
+      <div class="col-md-2" style="width: 50%">
+        <a class="pop">
+            <div class="BoxArea4" style="width: 100%;max-width:300px;margin: 0 auto;display: block;">
+                <img src="www/pcasvplot.png" alt="Workflow" style="width: 100%;max-width:300px;margin: 0 auto;display: block;max-height: 175px;"/>
+            </div>
+        </a>
+      </div>
+
+   </div>
+  </div>
+  
   
   
    <div class="col-md-6">

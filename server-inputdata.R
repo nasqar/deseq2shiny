@@ -5,8 +5,13 @@ observe({
   # 
   # removeClass("app-content", "hidden")
   
-  shinyjs::hide(selector = "a[data-value=\"conditionsTab\"]")
+  
+  # shinyjs::hide(selector = "a[data-value=\"conditionsTab1\"]")
+
   shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+  shinyjs::hide(selector = "a[data-value=\"svaseqTab\"]")
+  shinyjs::hide(selector = "a[data-value=\"conditionsTab\"]")
+  
   shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
   shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
   
@@ -119,6 +124,17 @@ observeEvent(input$prefilterCounts,ignoreInit = TRUE,{
 
 myValues <- reactiveValues()
 
+
+output$deseqMenu <- renderMenu({
+  if(!is.null(csvDataReactive()))
+    menuItem("2. Run DESeq2", tabName = "preprocTab", icon = icon("th"), startExpanded = T,
+             menuSubItem("Design Conditions", tabName = "conditionsTab"),
+             menuSubItem("Hidden Batch Effect", tabName = "svaseqTab"),
+             menuSubItem("Run DESeq2", tabName = "deseqTab")
+             )
+})
+
+
 observe({
   csvDataReactive()
 })
@@ -128,6 +144,7 @@ csvDataReactive <- eventReactive(input$submit,{
   fileContent = inputFileReactive()
   
   shinyjs::show(selector = "a[data-value=\"conditionsTab\"]")
+  updateTabItems(session, "tabs", "conditionsTab")
   shinyjs::runjs("window.scrollTo(0, 0)")
   
   sampleN = colnames(fileContent)
@@ -168,49 +185,6 @@ csvDataReactive <- eventReactive(input$submit,{
   {
     samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
   }
-  
-  
-  
-  
-  # sampleConditions = strsplit(sampleN,"_")
-  # #sampleConditions = unlist(sampleConditions)
-  # sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
-  # 
-  # 
-  # if(length(unique(sampleConditions)) == length(sampleN) )
-  #   updateCheckboxInput(session, "no_replicates", value = T)
-  # 
-  # 
-  # 
-  # if((input$no_replicates || length(unique(sampleConditions)) == length(sampleN)) && !identical(input$data_file_type,"examplecountsfactors"))
-  # {
-  #   sampleConditions = sampleN
-  #   #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
-  #   samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
-  #   
-  # }
-  # else
-  # {
-  #   if(identical(input$data_file_type,"examplecountsfactors"))
-  #   {
-  #     samples = read.csv("www/chenMeta.csv", header = TRUE, sep = ',', row.names = 1)
-  #     
-  #   }
-  #   else
-  #   {
-  #     sampleConditions = strsplit(sampleN,"_")
-  #     #sampleConditions = unlist(sampleConditions)
-  #     sampleConditions = unlist(lapply(sampleConditions, function(x){ x[1]}))
-  #     
-  #     #samples <- data.frame(row.names = sampleN, condition = sampleConditions)
-  #     samples <- data.frame(row.names = sampleN, Conditions = sampleConditions)
-  #     #updateTextInput(session,"designFormula",value = "~ Conditions")
-  #   }
-  #   
-  #   
-  #   
-  # }
-  
   
   
   myValues$DF = samples

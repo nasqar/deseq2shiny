@@ -131,6 +131,96 @@ metadataFileReactive <- reactive({
 })
 
 
+observe({
+  ddsInitReactive()
+})
+
+
+ddsInitReactive <- eventReactive(input$init_deseq2, {
+  
+  withProgress(message = "Initializing DESeq2 ...",{
+    
+    removeNotification("errorNotify")
+    removeNotification("errorNotify1")
+    #shinyjs::hide(selector = "a[data-value=\"deseqTab\"]")
+    shinyjs::hide(selector = "a[data-value=\"rlogTab\"]")
+    shinyjs::hide(selector = "a[data-value=\"vstTab\"]")
+    
+    shinyjs::hide(selector = "a[data-value=\"resultsTab\"]")
+    shinyjs::hide(selector = "a[data-value=\"boxplotTab\"]")
+    shinyjs::hide(selector = "a[data-value=\"heatmapTab\"]")
+    
+    myValues$status = NULL
+    myValues$dds = NULL
+    
+    js$addStatusIcon("conditionsTab","loading")
+    shiny::setProgress(value = 0.2, detail = "...")
+    
+    
+    myValues$DF = hot_to_r(input$table)
+    
+    samples <- myValues$DF
+    dataCounts <- myValues$dataCounts
+    
+    rownames(samples) = samples$Samples
+    samples$Samples = NULL
+    
+    # convert factors to unordered
+    #factor(samples, ordered = F)
+    
+    
+    for (i in 1:ncol(samples)) {
+      if(all(class(samples[,i]) %in% c("ordered","factor")))
+        samples[,i] = factor(samples[,i], ordered = F)
+    }
+    
+    rownames(samples) = rownames(myValues$DF)
+    
+    isolate({
+      
+      validate(need(
+        tryCatch({
+          dds <- DESeqDataSetFromMatrix(dataCounts, colData=samples,design = as.formula(input$designFormula))
+        },
+        error = function(e)
+        {
+          myValues$status = paste("DESeq2 Error: ",e$message)
+          
+          showNotification(id="errorNotify", myValues$status, type = "error", duration = NULL)
+          showNotification(id="errorNotify1", "Fix design formula OR Factors/Conditions", type = "error", duration = NULL)
+          
+          
+          js$addStatusIcon("conditionsTab","fail") 
+        }
+        ),
+        "Error"
+      )) 
+      
+      
+      
+    })
+    
+    updateTextInput(session,"designFormulaSva", value = paste(as.character(design(dds)), collapse = " "))
+    
+    js$addStatusIcon("conditionsTab","done")
+    shinyjs::show(selector = "a[data-value=\"deseqTab\"]")
+    updateTabItems(session, "tabs", "deseqTab")
+    
+    shiny::setProgress(value = 0.8, detail = "...")
+    myValues$dds = dds
+    return(dds)
+  })
+})
+
+output$ddsInitAvailable <- reactive({
+  return(!is.null(ddsInitReactive()))
+})
+outputOptions(output, 'ddsInitAvailable', suspendWhenHidden=FALSE)
+
+
+
+
+
 updateDesignFormula = function()
 {
   isolate({
@@ -148,6 +238,7 @@ updateDesignFormula = function()
       designFormula = paste(" ~ ",paste(groupvars, collapse=" + "))
     
     updateTextInput(session,"designFormula", value = designFormula)
+    updateTextInput(session,"designFormulaSva", value = designFormula)
   })
   
 }
