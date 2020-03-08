@@ -112,7 +112,7 @@ output$svaPlot <- renderPlotly({
 
 
 observeEvent(input$regressVarsBatch,ignoreInit = TRUE,{
-  withProgress(message = "Removing batch effect, this make take a long time.",{
+  withProgress(message = "Removing batch effect, this may take a long time.",{
   dds = myValues$ddsSva
   
   svaFormula = as.formula(input$newFormulaSva)
