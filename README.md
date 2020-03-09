@@ -10,6 +10,8 @@ It is meant to provide an intuitive interface for researchers to easily **upload
 
 This tool supports **simple or multi-factorial** experimental design. It also allows for exploratory analysis when no replicates are available.
 
+The app also provides svaseq **Surrogate Variable Analysis** for **hidden batch** effect detection. The user can then include Surrogate Variables (SVs) as adjustment factors for downstream analysis (eg. differential expression). For more information on svaseq, go to<a href="https://www.bioconductor.org/packages/devel/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#using-sva-with-deseq2" target="_blank"> this link</a>
+
 ### Online/Demo:
 You can try it online at http://nasqar.abudhabi.nyu.edu/deseq2shiny
 
