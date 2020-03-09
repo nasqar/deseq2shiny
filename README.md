@@ -1,4 +1,4 @@
-# DESeq2Shiny: Shiny app that wraps the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a> R package
+## DESeq2Shiny: a web-based app based on the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" target="_blank">DESeq2</a> R package for RNA-seq counts data exploratory analysis and differential expression
 
 ### Introduction
 ---
