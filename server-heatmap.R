@@ -37,6 +37,8 @@ heatmapReactive <- reactive({
       
       #vst = vst[,input$heat_group]
       
+      myValues$heatmap_path = paste0(tempdir(),'/','heatmap-highres.pdf')
+      
       if(!input$subsetGenes)
       {
         tmpsd = apply(logNormCounts,1,sd)
@@ -65,6 +67,7 @@ heatmapReactive <- reactive({
       }
       
       logNormCounts = logNormCounts[selectGenes,]
+      
       return(list('logNormCounts'=logNormCounts,'genesNotFound'=genesNotFound))
     })
     
@@ -76,6 +79,7 @@ heatmapReactive <- reactive({
 output$heatmapPlot <- renderPlot({
   if(!is.null(heatmapReactive()))
   {
+    
     logNormCounts= heatmapReactive()$logNormCounts
     genesNotFound = heatmapReactive()$genesNotFound
     
@@ -83,13 +87,7 @@ output$heatmapPlot <- renderPlot({
       need( is.null(genesNotFound) || length(genesNotFound) < 1, message = "Some genes were not found!"),
       need(nrow(logNormCounts) > 1, message = "Need atleast 2 genes to plot!")
     )
-    # 
-    # conditions = myValues$DF
-    # 
-    # isolate({
-    #   annCol = data.frame(Conditions=as.character(conditions[which(conditions$Conditions %in% input$heat_group),]))
-    # })
-    # 
+    
     
     coldata = colData(myValues$dds)
     coldata$sizeFactor = NULL
@@ -111,7 +109,10 @@ output$heatmapPlot <- renderPlot({
       
     }
     
-    aheatmap(logNormCounts,scale = "none",
+    generateHeatmapPdf(logNormCounts,Rowv,annLegend, annCol)
+    dev.off()
+    
+    p = aheatmap(logNormCounts,scale = "none",
                   revC=TRUE,
                   fontsize = 10,
                   cexRow = 1.2,
@@ -120,13 +121,42 @@ output$heatmapPlot <- renderPlot({
                   #color = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
                   annCol = annCol
              )
-    
+    return(p)
   }
   
   
 })
 
+generateHeatmapPdf <- function(logNormCounts,Rowv,annLegend, annCol)
+{
+  heatmaptmp = aheatmap(logNormCounts,scale = "none",
+           revC=TRUE,
+           fontsize = 10,
+           cexRow = 1.2,
+           Rowv = Rowv,
+           annLegend = annLegend,
+           #color = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
+           annCol = annCol,
+           filename = myValues$heatmap_path
+  )
+}
 
+output$heatmapHighResAvailable <- reactive({
+  
+  if(is.null(heatmapReactive()))
+    return(F)
+  
+  return(file.exists(myValues$heatmap_path))
+})
+outputOptions(output, 'heatmapHighResAvailable', suspendWhenHidden=FALSE)
+
+output$downloadHighResHeatmap <- downloadHandler(
+  filename = c('heatmap_highres.pdf'),
+  content = function(file) {
+    
+    file.copy(myValues$heatmap_path, file)
+  }
+)
 
 output$heatmapData <- renderDataTable({
   if(!is.null(heatmapReactive()))

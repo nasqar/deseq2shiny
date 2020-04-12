@@ -24,6 +24,11 @@ tabItem(tabName = "heatmapTab",
                      column(2,
                             actionButton("genHeatmap","Generate Plot", class = "btn btn-primary", style = "width:100%;")
                      ),
+                     column(2, offset = 10,
+                            conditionalPanel("output.heatmapHighResAvailable",
+                                             downloadButton('downloadHighResHeatmap', 
+                                                            'Download Heatmap', class = "btn btn-warning"))
+                            ),
                      column(12,
                             p("* This heatmap uses normalized counts which can be viewed/downloaded below the figure")
                             )
