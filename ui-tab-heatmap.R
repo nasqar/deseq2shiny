@@ -25,7 +25,7 @@ tabItem(tabName = "heatmapTab",
                             actionButton("genHeatmap","Generate Plot", class = "btn btn-primary", style = "width:100%;")
                      ),
                      column(2, offset = 10,
-                            conditionalPanel("output.heatmapHighResAvailable",
+                            conditionalPanel("output.heatmapComputed",
                                              downloadButton('downloadHighResHeatmap', 
                                                             'Download Heatmap', class = "btn btn-warning"))
                             ),

@@ -110,7 +110,7 @@ output$heatmapPlot <- renderPlot({
     }
     
     generateHeatmapPdf(logNormCounts,Rowv,annLegend, annCol)
-    dev.off()
+    #dev.off()
     
     p = aheatmap(logNormCounts,scale = "none",
                   revC=TRUE,
@@ -141,14 +141,14 @@ generateHeatmapPdf <- function(logNormCounts,Rowv,annLegend, annCol)
   )
 }
 
-output$heatmapHighResAvailable <- reactive({
-  
-  if(is.null(heatmapReactive()))
-    return(F)
-  
-  return(file.exists(myValues$heatmap_path))
-})
-outputOptions(output, 'heatmapHighResAvailable', suspendWhenHidden=FALSE)
+# output$heatmapHighResAvailable <- reactive({
+#   
+#   if(is.null(heatmapReactive()))
+#     return(F)
+#   
+#   return(file.exists(myValues$heatmap_path))
+# })
+# outputOptions(output, 'heatmapHighResAvailable', suspendWhenHidden=FALSE)
 
 output$downloadHighResHeatmap <- downloadHandler(
   filename = c('heatmap_highres.pdf'),
